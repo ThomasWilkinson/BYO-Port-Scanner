@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<!--My name is Thomas Wilkinson and this is the web page / front end for my python script I wrote to scan ports and trace routes. I hope this helps you and you have a fun time doing it! -->
+<html>
+
+	<head>
+		<meta http-equiv="Content-Language" content="en-us">
+		<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+		<link href="./css/home.css" rel="stylesheet">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script> 
+
+		<title>Port Scanner to Rule Them All</title>
+
+		<!--This next part is purely for the indent of Gollum's quote-->
+		<style type="text/css">
+		<!--
+		.tab { margin-left: 40px; }
+		-->
+		</style>
+
+		
+
+	</head>
+	<!-- I got this ajax function to be able to handle both update links due to the help of my friend Tanner. I was trying to use promises before, but he suggested using a callback, and the 'success:' item in the $.ajax. I got rid of .done and put the callback function with the success and then it started working.-->
+	<script>
+		function ajaxDisplay(link){
+			
+			setInterval(function(myLink){
+		    	console.log(myLink);
+				$.ajax({
+					cache:false, 
+					url: myLink,
+					dataType: "html",
+					success: function(anything){
+						console.log("Got here");
+						console.log(myLink);
+						document.getElementById(myLink.substring(1,l=myLink.length)).innerHTML = anything
+					}
+				})
+
+		    }, 1500, link);
+
+		}
+	</script>
+
+	<body onload = "ajaxDisplay('/report'); ajaxDisplay('/trace')">
+
+	<!--ajaxDisplayPort(); ajaxDisplayTrace();ajaxDisplay('/report'); ajaxDisplay('/trace'); when I was more ambitious I intended on using one function but ran out of time.-->
+
+	<!--Note that this responds to a multi-threaded web server, so as a result the port scan results show up asynchronously rather than all at once. Wait for the "Scan complete" before freaking out if something in here is broken haha -->
+	<div class = "total">
+		<h1>Welcome to the "one" Port Scanner to Rule them All.</h1>
+		<p> <i>"It cannot be seen, cannot be felt,<br>Cannot be heard, cannot be smelt,<br>It lies behind stars and under hills,<br>And empty holes it fills,<br>It comes first and follows after,<br>Ends life, kills laughter."<br></i></p>
+		<p class = tab><i>- Gollum</i> </p>
+		<br>
+		<p>While this web app cannot do all of those things listed above, this CAN scan ports and trace routes... Please enter in what hosts and ports you would like to scan below:<p>
+
+		<p><i>Please note that these fields currently only accept numbers, hyphens, commas, periods, and backspaces. This is to make the input as easy to handle as possible for the python backend.</i></p>
+		<br>
+
+		<form method="GET" action="/portScanner?hosts=&ports=">
+		<!--<form action="/portScanner.py">-->
+		  Host(s):<br>
+		  <input type="text" size=50 name="hosts" placeholder="'192.168.207.29, 192.168.207.119' or '192.168.207.2-254'">
+		  <br>
+		  Please put in IP addresses. You can use CIDR addressings, hyphenated ranges, or a comma delimted list. (comma and then a space afterwards). You can also do all three at the same time assuming you comma-space delimit them.
+		  <br>
+		  <br>
+		  Ports:<br>
+		  <input type="text" name="ports" placeholder="'22-80' or '22, 80, 119, 1024'">
+		  <br>
+		  Ports can be a list of comma delimited list of numbers or a range. Note that the the more there are and the bigger the range, the longer it will take to run. I've also noticed that because this is a TCP port scan the closed ports take a while to respond.
+		  <br><br>
+		  <input type="submit" value="Port Scan the Hosts">
+		  <button type="submit" formmethod="get" formaction="/traceroute?hosts=">Traceroute for the Hosts</button>
+
+		</form> 
+		<!-- I decided not to use this anymore when I decided to timestamp things, but I'll leave it here in case I decide to use it again in the future.
+		<form method="GET" action="/clear">
+		<input type="submit" value="Clear Scan Results">
+		</form>-->
+		
+		<form method="GET" action="/write">
+		<input type="submit" value="Write Results to a text file!">
+		</form>
+		
+		<h1>Port Scan Data:</h1>
+		<div id = "report">
+				<!-- port data here -->
+		</div>
+		<br><h1>Trace Route Data:</h1>
+		<div id = "trace">
+			<!--Trace route data here-->
+		</div>
+
+		<script>
+			$("input[name=hosts]").keypress(function (e) {
+
+  			if (/\d+|,+|[/b]+|-+|\.+|\s+/i.test(e.key) ){
+      			console.log("character accepted: " + e.key)
+    		} 
+    		else {
+    			window.alert("Illegal character detected: "+ e.key)
+      			return false;
+    		} 
+		});
+		</script>
+		<script>
+			$("input[name=ports]").keypress(function (e) {
+
+  			if (/\d+|,+|[/b]+|-+|\s+/i.test(e.key) ){
+      			console.log("character accepted: " + e.key)
+    		} 
+    		else {
+    			window.alert("Illegal character detected: "+ e.key)
+      			return false;
+    		} 
+		});
+		</script>
+
+	</div>
+
+	</body>
+
+
+</html>
